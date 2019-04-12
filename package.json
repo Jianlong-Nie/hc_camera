@@ -3,6 +3,7 @@
   "name": "hc-camera",
   "version": "1.0.6",
   "description": "",
+  "repository": "https://github.com/zhuchuanwu/hc_camera.git",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
