@@ -1,7 +1,7 @@
 
 {
   "name": "hc-camera",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "",
   "repository": "https://github.com/zhuchuanwu/hc_camera.git",
   "main": "index.js",
