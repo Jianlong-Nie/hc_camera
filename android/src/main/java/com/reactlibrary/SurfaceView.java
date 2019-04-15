@@ -28,7 +28,7 @@ public class SurfaceView extends LinearLayout {
 
         autoFitTextureView = new AutoFitTextureView(context);
         DisplayMetrics dm = getResources().getDisplayMetrics();
-        autoFitTextureView.setSelfSize(dm.widthPixels, dm.heightPixels - 300);
+        autoFitTextureView.setSelfSize(dm.widthPixels, dm.heightPixels - 280);
         addView(autoFitTextureView);
 
         setBackgroundColor(Color.BLUE);
