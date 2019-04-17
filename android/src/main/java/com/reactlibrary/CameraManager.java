@@ -120,7 +120,7 @@ public class CameraManager {
      */
     private static final int MAX_PREVIEW_WIDTH = 1080;
 
-    private static final int cameraRotation = 2;
+    private int cameraRotation = 2;
     /**
      * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
      * {@link TextureView}.
@@ -397,6 +397,7 @@ public class CameraManager {
 
     public CameraManager(ReactContext context) {
         mContext = context;
+        cameraRotation = isPad(mContext) ? 2 : 0;
     }
 
     public void setupPreview(AutoFitTextureView textureView) {
@@ -761,8 +762,45 @@ public class CameraManager {
     public void takePicture(File destFile, Promise promise) {
         ImageReader.OnImageAvailableListener listener = new ImageAvailableListener(destFile, promise);
         mImageReader.setOnImageAvailableListener(listener, mImageSaverHandler);
+
+        if (null == mCameraDevice) {
+            android.hardware.camera2.CameraManager manager = (android.hardware.camera2.CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
+            try {
+                startBackgroundThread();
+                if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                    throw new RuntimeException("Time out waiting to lock camera opening.");
+                }
+                manager.openCamera(mCameraId, new CameraDevice.StateCallback(){
+
+                    @Override
+                    public void onOpened(CameraDevice cameraDevice) {
+                        mCameraDevice = cameraDevice;
+                        captureStillPicture();
+                    }
+
+                    @Override
+                    public void onDisconnected(CameraDevice cameraDevice) {
+                        mCameraDevice = cameraDevice;
+                    }
+
+                    @Override
+                    public void onError(CameraDevice cameraDevice, int i) {
+                        mCameraDevice = cameraDevice;
+                    }
+                }, mBackgroundHandler);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        } else  {
+            captureStillPicture();
+        }
+
 //        lockFocus();
-        captureStillPicture();
+
     }
 
     /**
@@ -890,6 +928,12 @@ public class CameraManager {
             requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
         }
+    }
+
+    public static boolean isPad(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     /**
