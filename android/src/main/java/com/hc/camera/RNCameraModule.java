@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.hc.camera;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reactlibrary;
+package com.hc.camera;
 
 import android.app.Activity;
 import android.content.Context;
