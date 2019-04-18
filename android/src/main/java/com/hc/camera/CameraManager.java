@@ -759,7 +759,7 @@ public class CameraManager {
     /**
      * Initiate a still image capture.
      */
-    public void takePicture(File destFile, Promise promise) {
+    public void takePicture(File destFile, final Promise promise) {
         ImageReader.OnImageAvailableListener listener = new ImageAvailableListener(destFile, promise);
         mImageReader.setOnImageAvailableListener(listener, mImageSaverHandler);
 
@@ -775,7 +775,7 @@ public class CameraManager {
                     @Override
                     public void onOpened(CameraDevice cameraDevice) {
                         mCameraDevice = cameraDevice;
-                        captureStillPicture();
+                        captureStillPicture(promise);
                     }
 
                     @Override
@@ -790,13 +790,16 @@ public class CameraManager {
                 }, mBackgroundHandler);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
+                promise.reject(e);
             } catch (InterruptedException e) {
-                throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
+                e.printStackTrace();
+                promise.reject(e);
             } catch (SecurityException e) {
                 e.printStackTrace();
+                promise.reject(e);
             }
         } else  {
-            captureStillPicture();
+            captureStillPicture(promise);
         }
 
 //        lockFocus();
@@ -842,7 +845,7 @@ public class CameraManager {
      * Capture a still picture. This method should be called when we get a response in
      * {@link #mCaptureCallback} from both {@link #lockFocus()}.
      */
-    private void captureStillPicture() {
+    private void captureStillPicture(Promise promise) {
         try {
             final Activity activity = mContext.getCurrentActivity();
             if (null == activity || null == mCameraDevice) {
@@ -878,6 +881,13 @@ public class CameraManager {
             mCaptureSession.capture(captureBuilder.build(), CaptureCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            promise.reject(e);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            promise.reject(e);
+        } catch(Exception e) {
+            e.printStackTrace();
+            promise.reject(e);
         }
     }
 

@@ -31,7 +31,7 @@ public class SurfaceView extends LinearLayout {
         autoFitTextureView.setSelfSize(dm.widthPixels, dm.heightPixels - 260);
         addView(autoFitTextureView);
 
-        setBackgroundColor(Color.BLUE);
+        setBackgroundColor(Color.BLACK);
 
 //        ViewTreeObserver vto2 = getViewTreeObserver();
 //        vto2.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
